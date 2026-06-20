@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # ── Base de données MySQL ──────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: drivenow_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_DATABASE:-car_rental_db}
+      MYSQL_USER: ${DB_USERNAME:-drivenow}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-rootpassword}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - drivenow_network
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      timeout: 10s
+      retries: 10
+      interval: 5s
+
+  # ── Backend NestJS ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: drivenow_backend
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - drivenow_network
+
+volumes:
+  mysql_data:
+
+networks:
+  drivenow_network:
+    driver: bridge
