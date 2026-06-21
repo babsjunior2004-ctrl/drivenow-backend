@@ -2,7 +2,7 @@
 // Script pour ajouter plusieurs voitures d'un coup dans la base de données
 // Usage : node seed-cars.js VOTRE_TOKEN_ADMIN
 
-const API_URL = 'http://localhost:3000/api/cars';
+const API_URL = 'https://drivenow-backend-production.up.railway.app/api/cars';
 const token = process.argv[2];
 
 if (!token) {

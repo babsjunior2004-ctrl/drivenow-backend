@@ -2,7 +2,7 @@
 // Script pour ajouter 8 voitures supplémentaires (pour atteindre 16 au total)
 // Usage : node seed-cars-2.js VOTRE_TOKEN_ADMIN
 
-const API_URL = 'http://localhost:3000/api/cars';
+const API_URL = 'https://drivenow-backend-production.up.railway.app/api/cars';
 const token = process.argv[2];
 
 if (!token) {
