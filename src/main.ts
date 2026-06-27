@@ -1,10 +1,10 @@
-import { NestFactory } from "@nestjs/core";
-import { ValidationPipe } from "@nestjs/common";
-import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
-import { ConfigService } from "@nestjs/config";
-import helmet from "helmet";
-import { AppModule } from "./app.module";
-import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import helmet from 'helmet';
+import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,15 +14,18 @@ async function bootstrap() {
   // Sécurité
   app.use(helmet());
 
-  // CORS pour le frontend React/Vite (dev + preview)
+  // CORS dynamique — accepte toutes les origines déclarées dans FRONTEND_URL
+  const frontendUrl = configService.get<string>('FRONTEND_URL', '');
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3001',
+    ...frontendUrl.split(',').map((u) => u.trim()).filter(Boolean),
+  ];
+
   app.enableCors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3001",
-      "https://car-rental-25vl.vercel.app",
-    ],
-    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
 
@@ -39,37 +42,36 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Préfixe global de l'API
-  app.setGlobalPrefix("api");
+  app.setGlobalPrefix('api');
 
   // Configuration Swagger
   const config = new DocumentBuilder()
-    .setTitle("DriveNow API")
-    .setDescription(
-      "API REST pour la plateforme de location de voitures DriveNow",
-    )
-    .setVersion("1.0")
+    .setTitle('DriveNow API')
+    .setDescription('API REST pour la plateforme de location de voitures DriveNow')
+    .setVersion('1.0')
     .addBearerAuth(
-      { type: "http", scheme: "bearer", bearerFormat: "JWT" },
-      "access-token",
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'access-token',
     )
-    .addTag("Auth", "Authentification et gestion des sessions")
-    .addTag("Users", "Gestion des utilisateurs")
-    .addTag("Cars", "Gestion du parc automobile")
-    .addTag("Bookings", "Gestion des réservations")
-    .addTag("Payments", "Gestion des paiements")
-    .addTag("Weather", "Météo via OpenWeather API")
+    .addTag('Auth', 'Authentification et gestion des sessions')
+    .addTag('Users', 'Gestion des utilisateurs')
+    .addTag('Cars', 'Gestion du parc automobile')
+    .addTag('Bookings', 'Gestion des réservations')
+    .addTag('Payments', 'Gestion des paiements')
+    .addTag('Weather', 'Météo via OpenWeather API')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api/docs", app, document, {
+  SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: { persistAuthorization: true },
   });
 
-  const port = configService.get<number>("PORT", 3000);
-  await app.listen(port);
+  const port = configService.get<number>('PORT', 3000);
+  await app.listen(port, '0.0.0.0');
 
   console.log(`🚀 DriveNow Backend démarré sur : http://localhost:${port}`);
   console.log(`📚 Documentation Swagger : http://localhost:${port}/api/docs`);
+  console.log(`🌐 CORS autorisé pour : ${allowedOrigins.join(', ')}`);
 }
 
 bootstrap();

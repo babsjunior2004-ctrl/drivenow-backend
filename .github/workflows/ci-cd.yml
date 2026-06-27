@@ -61,6 +61,7 @@ jobs:
       JWT_SECRET: test_secret_for_ci_pipeline
       JWT_EXPIRES_IN: 7d
       OPENWEATHER_API_KEY: fake_key_for_tests
+      FRONTEND_URL: http://localhost:5173
 
     steps:
       - name: 📥 Checkout du code
@@ -78,7 +79,7 @@ jobs:
       - name: 🧪 Lancement des tests
         run: npm test --if-present || echo "Aucun test configuré pour l'instant"
 
-  # ── Job 3 : Docker Build ────────────────────────────────────────────────────
+  # ── Job 3 : Docker Build & Push ─────────────────────────────────────────────
   docker:
     name: 🐳 Build Image Docker
     runs-on: ubuntu-latest

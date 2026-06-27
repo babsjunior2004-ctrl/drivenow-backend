@@ -1,5 +1,25 @@
+# Dépendances
 node_modules/
+
+# Build
 dist/
+
+# Variables d'environnement (JAMAIS committer ces fichiers !)
 .env
-*.js.map
 .env.docker
+.env.railway
+
+# Logs
+*.log
+npm-debug.log*
+
+# Source maps
+*.js.map
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
