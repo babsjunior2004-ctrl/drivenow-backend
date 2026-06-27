@@ -165,4 +165,4 @@ docker-compose up -d
 ## 🔗 Liens
 
 - Frontend : [drivenow-frontend](https://github.com/babsjunior2004-ctrl/drivenow-frontend)
-- Swagger : `http://localhost:3000/api/docs`
+- Swagger : `https://drivenow-backend-production.up.railway.app/api/docs#/`
